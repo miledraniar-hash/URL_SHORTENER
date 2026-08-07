@@ -49,4 +49,29 @@ nav ul {
 .result {
     margin-top: 20px;
     font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.result a {
+    color: #fff;
+    text-decoration: underline;
+    word-break: break-all;
+}
+
+.result button {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    background: #ff4d94;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.result button:hover {
+    background: #ff2f83;
 }

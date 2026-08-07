@@ -9,11 +9,9 @@
 
 <div class="hero">
     <nav>
-        <h2 class="logo">AdLinkFly</h2>
+        <h2 class="logo">********</h2>
         <ul>
             <li>Home</li>
-            <li>Publisher Rates</li>
-            <li>Blog</li>
             <li>Login</li>
             <li>Sign Up</li>
         </ul>
@@ -21,18 +19,22 @@
 
     <div class="content">
         <h1>Best Shorten URLs</h1>
-        <p>Earn up to 20$ / 1000 views</p>
-
+        
         <form action="/shorten" method="post" class="shortener-box">
             <input type="text" name="original_url" placeholder="Your URL here" required>
             <button type="submit">Shorten</button>
         </form>
 
         {% if short_url %}
-            <p class="result">Short URL: {{ short_url }}</p>
+            <div class="result">
+                <span>Short URL:</span>
+                <a href="{{ short_url }}" target="_blank" id="short-url-link">{{ short_url }}</a>
+                <button type="button" id="copy-btn" onclick="copyShortUrl()">Copy</button>
+            </div>
         {% endif %}
     </div>
 </div>
 
+<script src="/static/css/js/script.js"></script>
 </body>
 </html>
