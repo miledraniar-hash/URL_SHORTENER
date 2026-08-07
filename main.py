@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, Depends, HTTPException,Request, Form
+from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
-
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from database import engine, SessionLocal
 from models.url import URL, Base
 from services.url_service import generate_short_code
@@ -9,6 +10,11 @@ from services.url_service import generate_short_code
 import validators
 
 app = FastAPI()
+# templates
+templates = Jinja2Templates(directory="templates")
+
+# fichiers statiques (CSS, JS)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -31,12 +37,13 @@ def shorten_url(original_url: str, db: Session = Depends(get_db)):
     URL.original_url == original_url
     ).first()
 
+
     if existing_url:
         return {
         "short_code": existing_url.short_code
 
     }
-
+    
     # 1. Create URL object first
     new_url = URL(
         original_url=original_url,
@@ -67,6 +74,10 @@ def shorten_url(original_url: str, db: Session = Depends(get_db)):
         "short_code": new_url.short_code
     }
 
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 
 # Redirect short URL
 @app.get("/{short_code}")
@@ -85,3 +96,5 @@ def redirect_url(short_code: str, db: Session = Depends(get_db)):
     return RedirectResponse(
         url=url.original_url
     )
+
+
