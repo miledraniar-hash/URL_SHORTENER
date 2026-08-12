@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="admin-container">
+
+        <h1>Bienvenue Admin 👋</h1>
+
+        <p>
+            Connecté avec :
+            <strong>{{ admin.email }}</strong>
+        </p>
+
+        <hr>
+
+        <h2>Dashboard</h2>
+
+        <p>
+            Ici nous allons ajouter les statistiques,
+            l'historique des URLs, les clics, etc.
+        </p>
+
+    </div>
+    <table class="urls-table">
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Original URL</th>
+            <th>Short URL</th>
+            <th>Clicks</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for url in urls %}
+
+        <tr>
+
+            <td>
+                {{ url.id }}
+            </td>
+
+            <td>
+                {{ url.original_url }}
+            </td>
+
+            <td>
+                <a
+                    href="/{{ url.short_code }}"
+                    target="_blank"
+                >
+                    /{{ url.short_code }}
+                </a>
+            </td>
+
+            <td>
+                <strong>
+                    {{ url.click_count }}
+                </strong>
+            </td>
+
+            <td>
+                {{ url.created_at }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</body>
+
+</html>

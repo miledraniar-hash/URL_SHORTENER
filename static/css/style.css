@@ -1,77 +1,1095 @@
-body {
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: Arial;
+    padding: 0;
 }
 
-.hero {
-    height: 100vh;
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    background: #12001f;
+    color: white;
+}
+
+/* ==============================
+   NAVBAR
+============================== */
+
+.navbar {
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px;
+    box-sizing: border-box;
+
+    background: rgba(15, 10, 40, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* LOGO */
+
+.logo a {
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #ff00cc;
+}
+
+/* LINKS */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+
+    transition: 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #ff00cc;
+}
+
+/* SIGN IN BUTTON */
+
+.nav-links li:last-child a {
+    background: linear-gradient(135deg, #ff00cc, #3333ff);
+    padding: 10px 22px;
+    border-radius: 25px;
+    color: white;
+}
+
+.nav-links li:last-child a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 0, 204, 0.4);
+    color: white;
+}
+
+/* ==============================
+   ACCOUNT BUTTON
+============================== */
+
+.account-btn {
+    border: none;
+    cursor: pointer;
+
     background: linear-gradient(135deg, #ff00cc, #3333ff);
     color: white;
+
+    padding: 10px 22px;
+    border-radius: 25px;
+
+    font-size: 16px;
+    font-weight: 500;
+
+    transition: 0.3s ease;
+}
+
+.account-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 0, 204, 0.4);
+}
+
+
+/* ==============================
+   AUTH MODAL
+============================== */
+
+.auth-overlay {
+    display: none;
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(5, 3, 20, 0.75);
+    backdrop-filter: blur(8px);
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 2000;
+}
+
+.auth-box {
+    width: 400px;
+    max-width: 90%;
+
+    padding: 35px;
+
+    background: rgba(25, 15, 55, 0.95);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+    position: relative;
+
+    animation: authAppear 0.25s ease;
+}
+
+@keyframes authAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-box h2 {
     text-align: center;
+    margin: 0;
+    font-size: 28px;
 }
 
-nav {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
+.auth-subtitle {
+    text-align: center;
+    color: #bdb8d0;
+    margin-bottom: 30px;
 }
 
-nav ul {
+
+/* ==============================
+   AUTH OPTIONS
+============================== */
+
+.auth-option {
     display: flex;
-    gap: 20px;
-    list-style: none;
+    align-items: center;
+    gap: 18px;
+
+    text-decoration: none;
+    color: white;
+
+    padding: 18px;
+
+    margin-top: 15px;
+
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    transition: 0.3s ease;
 }
+
+.auth-option:hover {
+    background: rgba(255, 0, 204, 0.12);
+    border-color: rgba(255, 0, 204, 0.4);
+
+    transform: translateY(-2px);
+}
+
+.auth-icon {
+    width: 45px;
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: linear-gradient(
+        135deg,
+        #ff00cc,
+        #3333ff
+    );
+
+    font-size: 21px;
+}
+
+.auth-option h3 {
+    margin: 0 0 5px;
+    font-size: 17px;
+}
+
+.auth-option p {
+    margin: 0;
+    color: #aaa5bd;
+    font-size: 13px;
+}
+
+
+/* ==============================
+   CLOSE BUTTON
+============================== */
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+
+    border: none;
+    background: none;
+
+    color: white;
+
+    font-size: 28px;
+    cursor: pointer;
+
+    opacity: 0.7;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 70px;
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 0, 204, 0.35),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 80% 80%,
+            rgba(51, 51, 255, 0.40),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #16001f,
+            #24105c,
+            #111b5c
+        );
+}
+
+/* =========================
+   BACKGROUND EFFECTS
+========================= */
+
+.hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 400px;
+    height: 400px;
+
+    background: #ff00cc;
+
+    border-radius: 50%;
+
+    filter: blur(120px);
+
+    opacity: 0.25;
+
+    top: -150px;
+    left: -150px;
+}
+
+.hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 400px;
+    height: 400px;
+
+    background: #3333ff;
+
+    border-radius: 50%;
+
+    filter: blur(120px);
+
+    opacity: 0.25;
+
+    bottom: -150px;
+    right: -150px;
+}
+
+/* =========================
+   CONTENT
+========================= */
 
 .content {
-    margin-top: 100px;
+    position: relative;
+    z-index: 2;
+
+    width: 90%;
+    max-width: 850px;
+
+    text-align: center;
+
+    padding: 50px 20px;
+
+    animation: fadeIn 0.8s ease;
 }
+
+/* =========================
+   TITLE
+========================= */
+
+.content h1 {
+    margin-bottom: 40px;
+
+    font-size: clamp(42px, 7vw, 72px);
+
+    font-weight: 800;
+
+    line-height: 1.1;
+
+    background: linear-gradient(
+        90deg,
+        #ffffff,
+        #ff70b7
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+/* =========================
+   SHORTENER FORM
+========================= */
 
 .shortener-box {
-    margin-top: 20px;
+    width: 100%;
+    max-width: 700px;
+
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    padding: 7px;
+
+    border-radius: 50px;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.35);
 }
+
+/* =========================
+   INPUT
+========================= */
 
 .shortener-box input {
-    padding: 15px;
-    width: 300px;
-    border-radius: 25px 0 0 25px;
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 18px 22px;
+
     border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 16px;
 }
+
+.shortener-box input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* =========================
+   SHORTEN BUTTON
+========================= */
 
 .shortener-box button {
-    padding: 15px 20px;
-    border-radius: 0 25px 25px 0;
+    padding: 16px 32px;
+
     border: none;
-    background: #ff4d94;
+
+    border-radius: 40px;
+
+    background: linear-gradient(
+        135deg,
+        #ff4d94,
+        #ff008c
+    );
+
     color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
     cursor: pointer;
+
+    transition: 0.3s ease;
 }
 
+.shortener-box button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 25px rgba(255, 0, 140, 0.5);
+}
+
+.shortener-box button:active {
+    transform: scale(0.97);
+}
+
+/* =========================
+   RESULT
+========================= */
+
 .result {
-    margin-top: 20px;
-    font-size: 18px;
+    width: 100%;
+    max-width: 700px;
+
+    margin: 30px auto 0;
+
+    padding: 20px 25px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.25);
+
+    animation: resultAppear 0.5s ease;
+}
+
+.result span {
+    font-size: 15px;
+
+    font-weight: bold;
+
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.result a {
+    color: #ff9fc5;
+
+    font-size: 16px;
+
+    text-decoration: none;
+
+    word-break: break-all;
+}
+
+.result a:hover {
+    color: white;
+
+    text-decoration: underline;
+}
+
+/* =========================
+   COPY BUTTON
+========================= */
+
+.result button {
+    padding: 9px 18px;
+
+    border: none;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.15);
+
+    color: white;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+.result button:hover {
+    background: #ff4d94;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 15px rgba(255, 77, 148, 0.35);
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes resultAppear {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
+    .content {
+        padding: 40px 15px;
+    }
+
+    .content h1 {
+        font-size: 42px;
+        margin-bottom: 30px;
+    }
+
+    .shortener-box {
+        flex-direction: column;
+
+        border-radius: 20px;
+
+        padding: 8px;
+    }
+
+    .shortener-box input {
+        width: 100%;
+
+        padding: 16px;
+
+        text-align: center;
+    }
+
+    .shortener-box button {
+        width: 100%;
+
+        border-radius: 15px;
+    }
+
+    .result {
+        flex-direction: column;
+
+        padding: 20px 15px;
+    }
+}
+
+/* ==============================
+   LOGIN PAGE
+============================== */
+
+.login-page {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(255, 0, 204, 0.20),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            rgba(51, 51, 255, 0.25),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #16001f,
+            #24105c,
+            #111b5c
+        );
+
+    color: white;
+}
+
+
+/* ==============================
+   LOGIN CONTAINER
+============================== */
+
+.login-container {
+
+    min-height: calc(100vh - 70px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 100px 20px 40px;
+
+    box-sizing: border-box;
+}
+
+
+/* ==============================
+   LOGIN CARD
+============================== */
+
+.login-card {
+
+    width: 420px;
+    max-width: 100%;
+
+    padding: 40px;
+
+    box-sizing: border-box;
+
+    background: rgba(20, 10, 45, 0.75);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 24px;
+
+    backdrop-filter: blur(15px);
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.45);
+
+}
+
+
+/* ==============================
+   LOGIN ICON
+============================== */
+
+.login-icon {
+
+    width: 60px;
+    height: 60px;
+
+    margin: 0 auto 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff00cc,
+            #3333ff
+        );
+
+    font-size: 28px;
+
+    box-shadow:
+        0 10px 30px rgba(255, 0, 204, 0.25);
+
+}
+
+
+/* ==============================
+   TITLE
+============================== */
+
+.login-card h1 {
+
+    text-align: center;
+
+    margin: 0;
+
+    font-size: 32px;
+
+}
+
+
+.login-subtitle {
+
+    text-align: center;
+
+    color: #aaa5bd;
+
+    margin: 10px 0 32px;
+
+    font-size: 15px;
+
+}
+
+
+/* ==============================
+   FORM
+============================== */
+
+.form-group {
+
+    margin-bottom: 22px;
+
+}
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+}
+
+
+.form-group input {
+
+    width: 100%;
+
+    padding: 14px 16px;
+
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 12px;
+
+    outline: none;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    color: white;
+
+    font-size: 15px;
+
+    transition: 0.3s ease;
+
+}
+
+
+.form-group input::placeholder {
+
+    color: #817c94;
+
+}
+
+
+.form-group input:focus {
+
+    border-color: #ff00cc;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    box-shadow:
+        0 0 0 3px rgba(255, 0, 204, 0.10);
+
+}
+
+
+/* ==============================
+   PASSWORD LABEL
+============================== */
+
+.password-label {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+.password-label a {
+
+    color: #c5b9ff;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+}
+
+
+.password-label a:hover {
+
+    color: #ff00cc;
+
+}
+
+
+/* ==============================
+   LOGIN BUTTON
+============================== */
+
+.login-btn {
+
+    width: 100%;
+
+    padding: 14px;
+
+    margin-top: 5px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff00cc,
+            #3333ff
+        );
+
+    transition: 0.3s ease;
+
+}
+
+
+.login-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 30px rgba(255, 0, 204, 0.30);
+
+}
+
+
+/* ==============================
+   CREATE ACCOUNT
+============================== */
+
+.signup-text {
+
+    text-align: center;
+
+    margin-top: 25px;
+
+    color: #aaa5bd;
+
+    font-size: 14px;
+
+}
+
+
+.signup-text a {
+
+    color: #ff4bd8;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+}
+
+
+.signup-text a:hover {
+
+    text-decoration: underline;
+
+}
+/* ==========================================
+   SHORT URL
+========================================== */
+
+.short-url-row {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    flex-wrap: wrap;
+    margin-top: 10px;
 }
 
-.result a {
-    color: #fff;
-    text-decoration: underline;
+.short-url-row a {
     word-break: break-all;
 }
 
-.result button {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: none;
-    background: #ff4d94;
-    color: white;
-    cursor: pointer;
+
+/* ==========================================
+   SHARE SECTION
+========================================== */
+
+.share-section {
+    margin-top: 25px;
+    padding: 22px;
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    backdrop-filter: blur(10px);
+
+    text-align: center;
+}
+
+.share-section h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.share-section p {
+    margin: 0 0 18px;
+    opacity: 0.75;
     font-size: 14px;
 }
 
-.result button:hover {
-    background: #ff2f83;
+
+/* ==========================================
+   SHARE BUTTONS
+========================================== */
+
+.share-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 11px 16px;
+
+    border-radius: 10px;
+
+    color: white;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.share-btn:hover {
+    transform: translateY(-3px);
+    opacity: 0.9;
+}
+
+.share-btn span {
+    font-size: 17px;
+}
+
+
+/* WhatsApp */
+
+.whatsapp {
+    background: #25D366;
+}
+
+
+/* Facebook */
+
+.facebook {
+    background: #1877F2;
+}
+
+
+/* X */
+
+.twitter {
+    background: #000000;
+}
+
+
+/* Telegram */
+
+.telegram {
+    background: #229ED9;
+}
+
+
+/* Email */
+
+.email {
+    background: #6c63ff;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .short-url-row {
+        flex-direction: column;
+    }
+
+    .share-buttons {
+        flex-direction: column;
+    }
+
+    .share-btn {
+        width: 80%;
+        justify-content: center;
+    }
+
 }

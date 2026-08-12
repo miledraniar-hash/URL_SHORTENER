@@ -1,40 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>URL Shortener</title>
+
     <link rel="stylesheet" href="/static/css/style.css">
+
 </head>
+
+<script>
+function openAuthModal() {
+    document.getElementById("authModal").style.display = "flex";
+}
+
+function closeAuthModal() {
+    document.getElementById("authModal").style.display = "none";
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById("authModal");
+
+    if (event.target === modal) {
+        closeAuthModal();
+    }
+}
+function copyShortUrl() {
+
+    const link = document.getElementById("short-url-link").innerText;
+
+    navigator.clipboard.writeText(link);
+
+    const button = document.getElementById("copy-btn");
+
+    button.innerText = "Copied!";
+
+    setTimeout(() => {
+        button.innerText = "Copy";
+    }, 2000);
+}
+</script>
+
 <body>
 
-<div class="hero">
-    <nav>
-        <h2 class="logo">********</h2>
-        <ul>
-            <li>Home</li>
-            <li>Login</li>
-            <li>Sign Up</li>
-        </ul>
-    </nav>
+    <div class="hero">
 
-    <div class="content">
-        <h1>Best Shorten URLs</h1>
+        <div class="content">
+
+            <h1>Best Shorten URLs</h1>
+
+            <form action="/shorten" method="post" class="shortener-box">
+
+                <input
+                    type="text"
+                    name="original_url"
+                    placeholder="Your URL here"
+                    required
+                >
+
+                <button type="submit">
+                    Shorten
+                </button>
+
+            </form>
+
+{% if short_url %}
+
+<div class="result">
+
+    <span>Short URL:</span>
+
+    <div class="short-url-row">
+
+        <a
+            href="{{ short_url }}"
+            target="_blank"
+            id="short-url-link"
+        >
+            {{ short_url }}
+        </a>
+
+        <button
+            type="button"
+            id="copy-btn"
+            onclick="copyShortUrl()"
+        >
         
-        <form action="/shorten" method="post" class="shortener-box">
-            <input type="text" name="original_url" placeholder="Your URL here" required>
-            <button type="submit">Shorten</button>
-        </form>
-
-        {% if short_url %}
-            <div class="result">
-                <span>Short URL:</span>
-                <a href="{{ short_url }}" target="_blank" id="short-url-link">{{ short_url }}</a>
-                <button type="button" id="copy-btn" onclick="copyShortUrl()">Copy</button>
-            </div>
-        {% endif %}
+        </button>
+        <p>
+        Clicks:
+        <strong id="click-count">
+            {{ click_count }}
+        </strong>
+    </p>
     </div>
+
 </div>
 
-<script src="/static/css/js/script.js"></script>
+
+<!-- ==============================
+     SHARE SECTION
+================================ -->
+
+<div class="share-section">
+
+    <h3>Share your link 🚀</h3>
+
+    <p>Share your shortened URL with your friends</p>
+
+    <div class="share-buttons">
+
+        <!-- WhatsApp -->
+        <a
+            href="https://wa.me/?text={{ short_url | urlencode }}"
+            target="_blank"
+            class="share-btn whatsapp"
+        >
+            <span>💬</span>
+            WhatsApp
+        </a>
+
+
+        <!-- Facebook -->
+        <a
+            href="https://www.facebook.com/sharer/sharer.php?u={{ short_url | urlencode }}"
+            target="_blank"
+            class="share-btn facebook"
+        >
+            <span>f</span>
+            Facebook
+        </a>
+
+
+        <!-- X -->
+        <a
+            href="https://twitter.com/intent/tweet?url={{ short_url | urlencode }}"
+            target="_blank"
+            class="share-btn twitter"
+        >
+            <span>𝕏</span>
+            X
+        </a>
+
+
+        <!-- Telegram -->
+        <a
+            href="https://t.me/share/url?url={{ short_url | urlencode }}"
+            target="_blank"
+            class="share-btn telegram"
+        >
+            <span>✈</span>
+            Telegram
+        </a>
+
+
+        <!-- Email -->
+        <a
+            href="mailto:?subject=Check%20this%20link&body={{ short_url | urlencode }}"
+            class="share-btn email"
+        >
+            <span>✉</span>
+            Email
+        </a>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+        </div>
+
+    </div>
+
 </body>
+<nav class="navbar">
+    <div class="logo">
+        <a href="/">URL<span>Shortener</span></a>
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+
+        <li>
+            <button class="account-btn" onclick="openAuthModal()">
+                Account
+            </button>
+        </li>
+    </ul>
+</nav>
+
+<div class="auth-overlay" id="authModal">
+
+    <div class="auth-box">
+
+        <button class="close-btn" onclick="closeAuthModal()">
+            &times;
+        </button>
+
+        <h2>Welcome 👋</h2>
+
+        <p class="auth-subtitle">
+            Access your URLShortener account
+        </p>
+
+        <a href="/login" class="auth-option">
+            <div class="auth-icon">🔐</div>
+
+            <div>
+                <h3>Login</h3>
+                <p>I already have an account</p>
+            </div>
+        </a>
+
+        <a href="/signin" class="auth-option">
+            <div class="auth-icon">✨</div>
+
+            <div>
+                <h3>Create Account</h3>
+                <p>I'm new to URLShortener</p>
+            </div>
+        </a>
+
+    </div>
+
+</div>
 </html>
