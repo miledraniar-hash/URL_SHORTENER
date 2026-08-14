@@ -10,7 +10,9 @@ from passlib.context import CryptContext
 from models.admin import Admin
 from starlette.middleware.sessions import SessionMiddleware
 from models.click import Click
+from datetime import datetime, timedelta, timezone
 
+import base64
 import validators
 
 
@@ -69,6 +71,105 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# ==========================================
+# AD INTERSTITIAL SETTINGS
+# ==========================================
+
+AD_COUNTDOWN_SECONDS = 5
+
+
+# ==========================================
+# ANTI-FRAUD SETTINGS
+# ==========================================
+
+# Same IP clicking the same short link again
+# within this window doesn't count as a new
+# monetized click.
+
+ANTI_FRAUD_WINDOW_HOURS = 24
+
+
+# ==========================================
+# GET REAL CLIENT IP (reverse-proxy aware)
+# ==========================================
+
+def get_client_ip(request: Request) -> str | None:
+
+    # If the app sits behind a reverse proxy
+    # (nginx, Render, Railway, Cloudflare...),
+    # request.client.host is the proxy's IP,
+    # not the visitor's. The real IP is the
+    # first one in X-Forwarded-For.
+
+    forwarded_for = request.headers.get(
+        "x-forwarded-for"
+    )
+
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+
+    if request.client:
+        return request.client.host
+
+    return None
+
+
+# ==========================================
+# ANTI-FRAUD: HAS THIS IP ALREADY CLICKED
+# THIS LINK IN THE LAST 24H?
+# ==========================================
+
+def is_duplicate_click(
+    db: Session,
+    url_id: int,
+    ip_address: str | None
+) -> bool:
+
+    # No IP captured at all -> can't verify
+    # uniqueness, so it's treated as unsafe
+    # to monetize (see redirect_url below).
+
+    if not ip_address:
+        return False
+
+    window_start = (
+        datetime.now(timezone.utc)
+        - timedelta(hours=ANTI_FRAUD_WINDOW_HOURS)
+    )
+
+    existing = db.query(Click).filter(
+        Click.url_id == url_id,
+        Click.ip_address == ip_address,
+        Click.clicked_at >= window_start
+    ).first()
+
+    return existing is not None
+
+
+# ==========================================
+# OBFUSCATE DESTINATION URL FOR THE
+# INTERSTITIAL PAGE SOURCE
+# ==========================================
+
+# Not real encryption - the goal is just to
+# stop a casual "View Source" from revealing
+# the destination in plain text before the
+# countdown finishes. The URL is reversed
+# then base64-encoded; the browser reverses
+# the operation client-side (see ad countdown
+# JS in index.html).
+
+def obfuscate_url(url: str) -> str:
+
+    reversed_url = url[::-1]
+
+    encoded_bytes = base64.b64encode(
+        reversed_url.encode("utf-8")
+    )
+
+    return encoded_bytes.decode("utf-8")
 
 
 # ==========================================
@@ -373,7 +474,7 @@ def counter_page(
     "/admin/counter/{url_id}",
     response_class=HTMLResponse
 )
-def counter_page(
+def admin_counter_page(
     url_id: int,
     request: Request,
     db: Session = Depends(get_db)
@@ -417,10 +518,10 @@ def counter_page(
     )
 
 # ==========================================
-# REDIRECT SHORT URL
+# REDIRECT SHORT URL (via ad interstitial)
 # ==========================================
 
-@app.get("/{short_code}")
+@app.get("/{short_code}", response_class=HTMLResponse)
 def redirect_url(
     short_code: str,
     request: Request,
@@ -438,26 +539,41 @@ def redirect_url(
             detail="URL not found"
         )
 
-    # 2. Get visitor information
-    ip_address = request.client.host if request.client else None
+    # 2. Get visitor information (proxy-aware IP)
+    ip_address = get_client_ip(request)
 
     user_agent = request.headers.get("user-agent")
 
-    # 3. Create a new click
+    # 3. Anti-fraud: same IP already clicked this
+    #    exact link in the last 24h -> not monetized
+    duplicate = is_duplicate_click(
+        db,
+        url.id,
+        ip_address
+    )
+
+    # 4. Create a new click (this visit passes through the ad)
     click = Click(
         url_id=url.id,
         ip_address=ip_address,
         user_agent=user_agent,
-        is_monetized=False
+        is_monetized=not duplicate
     )
 
-    # 4. Save the click in PostgreSQL
+    # 5. Save the click in PostgreSQL
     db.add(click)
     db.commit()
 
-    # 5. Redirect the visitor
-    return RedirectResponse(
-        url=url.original_url,
-        status_code=307
+    # 6. Show the ad interstitial on top of index.html.
+    #    Destination is obfuscated - it's decoded and
+    #    used for redirect client-side after the
+    #    countdown finishes.
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {
+            "show_ad": True,
+            "destination_encoded": obfuscate_url(url.original_url),
+            "countdown": AD_COUNTDOWN_SECONDS
+        }
     )
-

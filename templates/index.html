@@ -444,6 +444,140 @@
 
             </div>
 
+
+            <!-- ==========================================
+                 AD INTERSTITIAL (shown when redirecting
+                 through a short link)
+            =========================================== -->
+
+            {% if show_ad %}
+
+            <div
+                class="ad-overlay active"
+                id="adOverlay"
+            >
+
+                <!-- TOP RIGHT COUNTDOWN (replaces "Close") -->
+
+                <div class="ad-topbar">
+
+                    <span
+                        class="ad-countdown"
+                        id="adCountdown"
+                    >
+                        {{ countdown }}
+                    </span>
+
+                </div>
+
+
+                <!-- AD CARD -->
+
+                <div class="ad-card">
+
+                    <div class="ad-badge">
+                        <span>ⓘ</span>
+                    </div>
+
+                    <div class="ad-content">
+
+                        <div class="ad-logo">
+                            URL<span>Shortener</span>
+                        </div>
+
+                        <h1>
+                            Your link is coming up
+                        </h1>
+
+                        <p>
+                            Thanks for waiting, you'll be
+                            redirected automatically 🚀
+                        </p>
+
+
+                        <!-- ==============================
+                             REAL AD SLOT
+                             For banner/native ad network
+                             tags (Adsterra Banner, AdSense,
+                             Monetag Native, etc).
+
+                             Paste the network's embed code
+                             INSIDE this div. It usually
+                             looks like:
+
+                             <script async data-cfasync="false"
+                                src="//pl000000.effectivegatecpm.com/xxxxx/invoke.js">
+                             </script>
+                             <div id="container-xxxxx"></div>
+
+                             Both the <script> tag and its
+                             target <div> go inside #ad-slot.
+                        =============================== -->
+
+                        <div
+                            id="ad-slot"
+                            class="ad-slot"
+                        >
+
+                            <!-- PASTE AD NETWORK CODE HERE
+                                 (delete the demo block below
+                                 once you have a real tag) -->
+
+                            <div class="ad-demo">
+
+                                <span class="ad-demo-tag">
+                                    DEMO AD
+                                </span>
+
+                                <p>
+                                    Your ad network banner
+                                    will appear here
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="ad-progress-track">
+                            <div
+                                class="ad-progress-bar"
+                                id="adProgressBar"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="ad-data"
+                data-destination-encoded="{{ destination_encoded }}"
+                data-countdown="{{ countdown }}"
+            ></div>
+
+
+            <!-- ==============================
+                 POPUNDER / INTERSTITIAL SCRIPT
+                 SLOT (PopAds, Adsterra Popunder,
+                 Monetag Popunder...).
+
+                 These networks don't need a
+                 container div - their <script>
+                 tag fires automatically once
+                 it's in the page. Paste it here,
+                 it will only load on this ad
+                 page (show_ad block), not on
+                 the homepage.
+            =============================== -->
+
+            <!-- PASTE POPUNDER SCRIPT TAG HERE -->
+
+            {% endif %}
+
         </div>
 
     </div>
@@ -783,6 +917,132 @@
             requestAnimationFrame(
                 animation
             );
+
+        }
+
+
+
+        /* ==========================================
+           AD INTERSTITIAL COUNTDOWN + AUTO REDIRECT
+        =========================================== */
+
+        const adData =
+            document.getElementById(
+                "ad-data"
+            );
+
+
+        if (adData) {
+
+            /*
+             * The destination was reversed then
+             * base64-encoded server-side, so it's
+             * not readable in plain text via
+             * "View Source". We reverse the
+             * operation here, right before it's
+             * actually needed.
+             */
+
+            function deobfuscateUrl(encoded) {
+
+                const decoded =
+                    atob(encoded);
+
+                return decoded
+                    .split("")
+                    .reverse()
+                    .join("");
+
+            }
+
+            const destination =
+                deobfuscateUrl(
+                    adData.dataset.destinationEncoded
+                );
+
+            let adSeconds =
+                parseInt(
+                    adData.dataset.countdown
+                );
+
+            const totalMs =
+                adSeconds * 1000;
+
+
+            const adSecondsEl =
+                document.getElementById(
+                    "adSeconds"
+                );
+
+            const adCountdownEl =
+                document.getElementById(
+                    "adCountdown"
+                );
+
+            const adProgressBar =
+                document.getElementById(
+                    "adProgressBar"
+                );
+
+
+            /*
+             * Animate the progress bar smoothly
+             * over the whole countdown duration
+             */
+
+            adProgressBar.style.transition =
+                `width ${totalMs}ms linear`;
+
+            requestAnimationFrame(
+                function () {
+
+                    requestAnimationFrame(
+                        function () {
+
+                            adProgressBar.style.width =
+                                "100%";
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /*
+             * Tick every second, then redirect.
+             * No close button — this cannot be skipped.
+             */
+
+            const adInterval =
+                setInterval(
+                    function () {
+
+                        adSeconds -= 1;
+
+                        if (adSeconds <= 0) {
+
+                            clearInterval(
+                                adInterval
+                            );
+
+                            window.location.replace(
+                                destination
+                            );
+
+                            return;
+
+                        }
+
+                        adSecondsEl.textContent =
+                            adSeconds;
+
+                        adCountdownEl.textContent =
+                            adSeconds;
+
+                    },
+                    1000
+                );
 
         }
 

@@ -1599,3 +1599,250 @@ body {
     }
 
 }
+
+/* =========================================================
+   AD INTERSTITIAL PAGE
+========================================================= */
+
+.ad-overlay {
+
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px 20px;
+
+    box-sizing: border-box;
+
+    background: #6b6b76;
+
+    z-index: 10000;
+}
+
+
+/* =========================================================
+   TOP RIGHT COUNTDOWN
+========================================================= */
+
+.ad-topbar {
+
+    position: absolute;
+
+    top: 25px;
+    right: 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: white;
+
+    font-weight: 700;
+}
+
+.ad-countdown {
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.15);
+
+    border: 2px solid white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+}
+
+.ad-countdown-label {
+
+    font-size: 14px;
+
+    opacity: 0.9;
+}
+
+
+/* =========================================================
+   AD CARD
+========================================================= */
+
+.ad-card {
+
+    position: relative;
+
+    width: 100%;
+
+    max-width: 700px;
+
+    background: white;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.45);
+
+    animation:
+        adAppear 0.4s ease;
+}
+
+@keyframes adAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================================================
+   INFO BADGE (top left)
+========================================================= */
+
+.ad-badge {
+
+    position: absolute;
+
+    top: 14px;
+    left: 14px;
+
+    width: 26px;
+    height: 26px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    color: #3333ff;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.25);
+
+    z-index: 2;
+}
+
+
+/* =========================================================
+   AD CONTENT
+========================================================= */
+
+.ad-content {
+
+    padding: 70px 40px 45px;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff00cc,
+            #3333ff
+        );
+
+    color: white;
+}
+
+.ad-logo {
+
+    font-size: 26px;
+
+    font-weight: 800;
+
+    margin-bottom: 25px;
+}
+
+.ad-logo span {
+
+    color: #ffd400;
+}
+
+.ad-content h1 {
+
+    font-size: 26px;
+
+    margin-bottom: 10px;
+}
+
+.ad-content p {
+
+    opacity: 0.9;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   PROGRESS BAR (visual countdown)
+========================================================= */
+
+.ad-progress-track {
+
+    width: 100%;
+    height: 8px;
+
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.25);
+
+    overflow: hidden;
+}
+
+.ad-progress-bar {
+
+    height: 100%;
+    width: 0%;
+
+    background: white;
+
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .ad-content {
+        padding: 60px 20px 35px;
+    }
+
+    .ad-topbar {
+        top: 15px;
+        right: 15px;
+    }
+
+    .ad-content h1 {
+        font-size: 22px;
+    }
+
+}
