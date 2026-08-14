@@ -309,6 +309,112 @@ def signin_page(request: Request):
         "signin.html"
     )
 
+@app.get("/api/clicks/{url_id}")
+def get_click_count(
+    url_id: int,
+    db: Session = Depends(get_db)
+):
+
+    url = db.query(URL).filter(
+        URL.id == url_id
+    ).first()
+
+    if not url:
+        raise HTTPException(
+            status_code=404,
+            detail="URL not found"
+        )
+
+    click_count = db.query(Click).filter(
+        Click.url_id == url_id
+    ).count()
+
+    return {
+        "url_id": url_id,
+        "click_count": click_count
+    }
+
+@app.get(
+    "/counter/{url_id}",
+    response_class=HTMLResponse
+)
+def counter_page(
+    url_id: int,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+
+    # Chercher l'URL
+    url = db.query(URL).filter(
+        URL.id == url_id
+    ).first()
+
+    if not url:
+        raise HTTPException(
+            status_code=404,
+            detail="URL not found"
+        )
+
+    # Compter les clics
+    click_count = db.query(Click).filter(
+        Click.url_id == url_id
+    ).count()
+
+    return templates.TemplateResponse(
+        request,
+        "counter.html",
+        {
+            "url": url,
+            "click_count": click_count
+        }
+    )
+
+@app.get(
+    "/admin/counter/{url_id}",
+    response_class=HTMLResponse
+)
+def counter_page(
+    url_id: int,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+
+    # Vérifier si l'admin est connecté
+    admin_id = request.session.get("admin_id")
+
+    if not admin_id:
+        return RedirectResponse(
+            url="/login",
+            status_code=303
+        )
+
+
+    # Chercher l'URL
+    url = db.query(URL).filter(
+        URL.id == url_id
+    ).first()
+
+    if not url:
+        raise HTTPException(
+            status_code=404,
+            detail="URL not found"
+        )
+
+
+    # Compter les clics
+    click_count = db.query(Click).filter(
+        Click.url_id == url_id
+    ).count()
+
+
+    return templates.TemplateResponse(
+        request,
+        "counter.html",
+        {
+            "url": url,
+            "click_count": click_count
+        }
+    )
 
 # ==========================================
 # REDIRECT SHORT URL
@@ -354,3 +460,4 @@ def redirect_url(
         url=url.original_url,
         status_code=307
     )
+

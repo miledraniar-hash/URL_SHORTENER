@@ -1,59 +1,89 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>URL Shortener</title>
 
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
 
 </head>
 
-<script>
-function openAuthModal() {
-    document.getElementById("authModal").style.display = "flex";
-}
-
-function closeAuthModal() {
-    document.getElementById("authModal").style.display = "none";
-}
-
-window.onclick = function(event) {
-    const modal = document.getElementById("authModal");
-
-    if (event.target === modal) {
-        closeAuthModal();
-    }
-}
-function copyShortUrl() {
-
-    const link = document.getElementById("short-url-link").innerText;
-
-    navigator.clipboard.writeText(link);
-
-    const button = document.getElementById("copy-btn");
-
-    button.innerText = "Copied!";
-
-    setTimeout(() => {
-        button.innerText = "Copy";
-    }, 2000);
-}
-</script>
 
 <body>
+
+
+    <!-- ==========================================
+         NAVBAR
+    =========================================== -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <a href="/">
+                URL<span>Shortener</span>
+            </a>
+
+        </div>
+
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="/">
+                    Home
+                </a>
+            </li>
+
+            <li>
+
+                <button
+                    class="account-btn"
+                    onclick="openAuthModal()"
+                >
+                    Account
+                </button>
+
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+
+    <!-- ==========================================
+         HERO
+    =========================================== -->
 
     <div class="hero">
 
         <div class="content">
 
-            <h1>Best Shorten URLs</h1>
+            <h1>
+                Best Shorten URLs
+            </h1>
 
-            <form action="/shorten" method="post" class="shortener-box">
+
+            <!-- SHORTENER FORM -->
+
+            <form
+                action="/shorten"
+                method="post"
+                class="shortener-box"
+            >
 
                 <input
                     type="text"
@@ -62,172 +92,776 @@ function copyShortUrl() {
                     required
                 >
 
+
                 <button type="submit">
                     Shorten
                 </button>
 
             </form>
 
-{% if short_url %}
-
-<div class="result">
-
-    <span>Short URL:</span>
-
-    <div class="short-url-row">
-
-        <a
-            href="{{ short_url }}"
-            target="_blank"
-            id="short-url-link"
-        >
-            {{ short_url }}
-        </a>
-
-        <button
-            type="button"
-            id="copy-btn"
-            onclick="copyShortUrl()"
-        >
-        
-        </button>
-        <p>
-        Clicks:
-        <strong id="click-count">
-            {{ click_count }}
-        </strong>
-    </p>
-    </div>
-
-</div>
 
 
-<!-- ==============================
-     SHARE SECTION
-================================ -->
+            <!-- ======================================
+                 RESULT + COUNTER (both need short_url)
+            ======================================= -->
 
-<div class="share-section">
+            {% if short_url %}
 
-    <h3>Share your link 🚀</h3>
+            <div class="result">
 
-    <p>Share your shortened URL with your friends</p>
-
-    <div class="share-buttons">
-
-        <!-- WhatsApp -->
-        <a
-            href="https://wa.me/?text={{ short_url | urlencode }}"
-            target="_blank"
-            class="share-btn whatsapp"
-        >
-            <span>💬</span>
-            WhatsApp
-        </a>
+                <span>
+                    Short URL:
+                </span>
 
 
-        <!-- Facebook -->
-        <a
-            href="https://www.facebook.com/sharer/sharer.php?u={{ short_url | urlencode }}"
-            target="_blank"
-            class="share-btn facebook"
-        >
-            <span>f</span>
-            Facebook
-        </a>
+                <div class="short-url-row">
 
 
-        <!-- X -->
-        <a
-            href="https://twitter.com/intent/tweet?url={{ short_url | urlencode }}"
-            target="_blank"
-            class="share-btn twitter"
-        >
-            <span>𝕏</span>
-            X
-        </a>
+                    <!-- SHORT URL -->
+
+                    <a
+                        href="{{ short_url }}"
+                        target="_blank"
+                        id="short-url-link"
+                    >
+                        {{ short_url }}
+                    </a>
 
 
-        <!-- Telegram -->
-        <a
-            href="https://t.me/share/url?url={{ short_url | urlencode }}"
-            target="_blank"
-            class="share-btn telegram"
-        >
-            <span>✈</span>
-            Telegram
-        </a>
+                    <!-- COPY -->
+
+                    <button
+                        type="button"
+                        id="copy-btn"
+                        onclick="copyShortUrl()"
+                    >
+                        Copy
+                    </button>
 
 
-        <!-- Email -->
-        <a
-            href="mailto:?subject=Check%20this%20link&body={{ short_url | urlencode }}"
-            class="share-btn email"
-        >
-            <span>✉</span>
-            Email
-        </a>
+                    <!-- COUNTER -->
 
-    </div>
+                    <button
+                        type="button"
+                        class="counter-btn"
+                        onclick="openCounterModal()"
+                    >
+                        📊 Counter Clicks
+                    </button>
 
-</div>
+                </div>
 
-{% endif %}
 
+                <!-- ==================================
+                     SHARE
+                =================================== -->
+
+                <div class="share-section">
+
+                    <h3>
+                        Share your link 🚀
+                    </h3>
+
+
+                    <p>
+                        Share your shortened URL
+                        with your friends
+                    </p>
+
+
+                    <div class="share-buttons">
+
+
+                        <!-- WhatsApp -->
+
+                        <a
+                            href="https://wa.me/?text={{ short_url | urlencode }}"
+                            target="_blank"
+                            class="share-btn whatsapp"
+                        >
+
+                            <span>
+                                💬
+                            </span>
+
+                            WhatsApp
+
+                        </a>
+
+
+
+                        <!-- Facebook -->
+
+                        <a
+                            href="https://www.facebook.com/sharer/sharer.php?u={{ short_url | urlencode }}"
+                            target="_blank"
+                            class="share-btn facebook"
+                        >
+
+                            <span>
+                                f
+                            </span>
+
+                            Facebook
+
+                        </a>
+
+
+
+                        <!-- X -->
+
+                        <a
+                            href="https://twitter.com/intent/tweet?url={{ short_url | urlencode }}"
+                            target="_blank"
+                            class="share-btn twitter"
+                        >
+
+                            <span>
+                                𝕏
+                            </span>
+
+                            X
+
+                        </a>
+
+
+
+                        <!-- Telegram -->
+
+                        <a
+                            href="https://t.me/share/url?url={{ short_url | urlencode }}"
+                            target="_blank"
+                            class="share-btn telegram"
+                        >
+
+                            <span>
+                                ✈
+                            </span>
+
+                            Telegram
+
+                        </a>
+
+
+
+                        <!-- Email -->
+
+                        <a
+                            href="mailto:?subject=Check%20this%20link&body={{ short_url | urlencode }}"
+                            class="share-btn email"
+                        >
+
+                            <span>
+                                ✉
+                            </span>
+
+                            Email
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                COUNTER DATA
+            ======================================= -->
+
+            <div
+                id="counter-data"
+                data-url-id="{{ url_id }}"
+                data-click-count="{{ click_count }}"
+            ></div>
+
+
+            <!-- ======================================
+                COUNTER MODAL
+            ======================================= -->
+
+            <div
+                class="counter-overlay"
+                id="counterOverlay"
+            >
+
+                <div class="counter-box">
+
+                    <!-- CLOSE -->
+                    <button
+                        type="button"
+                        class="close-btn"
+                        onclick="closeCounterModal()"
+                    >
+                        &times;
+                    </button>
+
+
+                    <!-- ICON -->
+                    <div class="counter-icon">
+                        📊
+                    </div>
+
+
+                    <!-- TITLE -->
+                    <h2>
+                        Click Counter
+                    </h2>
+
+
+                    <!-- URL -->
+                    <p class="counter-url">
+                        {{ short_url }}
+                    </p>
+
+
+                    <!-- NUMBER -->
+                    <div class="counter-number-container">
+
+                        <span id="modal-click-count">
+                            {{ click_count }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- LABEL -->
+                    <p class="counter-label">
+                        Total Clicks
+                    </p>
+
+
+                    <!-- LIVE -->
+                    <div class="counter-status">
+
+                        <span class="status-dot"></span>
+
+                        Live counter
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- ==========================================
+                 ACCOUNT MODAL
+            =========================================== -->
+
+            <div
+                class="auth-overlay"
+                id="authOverlay"
+            >
+
+                <div class="auth-box">
+
+
+                    <!-- CLOSE -->
+
+                    <button
+                        class="close-btn"
+                        onclick="closeAuthModal()"
+                    >
+                        &times;
+                    </button>
+
+
+
+                    <h2>
+                        Welcome 👋
+                    </h2>
+
+
+
+                    <p class="auth-subtitle">
+                        Access your URLShortener account
+                    </p>
+
+
+
+                    <!-- LOGIN -->
+
+                    <a
+                        href="/login"
+                        class="auth-option"
+                    >
+
+                        <div class="auth-icon">
+                            🔐
+                        </div>
+
+
+                        <div>
+
+                            <h3>
+                                Login
+                            </h3>
+
+                            <p>
+                                I already have an account
+                            </p>
+
+                        </div>
+
+                    </a>
+
+
+
+                    <!-- CREATE ACCOUNT -->
+
+                    <a
+                        href="/signin"
+                        class="auth-option"
+                    >
+
+                        <div class="auth-icon">
+                            ✨
+                        </div>
+
+
+                        <div>
+
+                            <h3>
+                                Create Account
+                            </h3>
+
+                            <p>
+                                I'm new to URLShortener
+                            </p>
+
+                        </div>
+
+                    </a>
+
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
+
+
+    <!-- ==========================================
+         JAVASCRIPT
+    =========================================== -->
+
+    <script>
+
+
+        /* ==========================================
+           ACCOUNT MODAL
+        =========================================== */
+
+        function openAuthModal() {
+
+            const overlay =
+                document.getElementById(
+                    "authOverlay"
+                );
+
+            overlay.style.display = "flex";
+
+        }
+
+
+        function closeAuthModal() {
+
+            const overlay =
+                document.getElementById(
+                    "authOverlay"
+                );
+
+            overlay.style.display = "none";
+
+        }
+
+
+
+        /* ==========================================
+           COPY SHORT URL
+        =========================================== */
+
+        function copyShortUrl() {
+
+            const link =
+                document.getElementById(
+                    "short-url-link"
+                );
+            if (!link) {
+                return;
+            }
+
+            navigator.clipboard.writeText(
+                link.href
+            );
+
+
+            const button =
+                document.getElementById(
+                    "copy-btn"
+                );
+            if (!button) {
+                return;
+            }
+
+            const oldText =
+                button.innerText;
+
+
+            button.innerText =
+                "Copied ✓";
+
+
+            setTimeout(
+                function () {
+
+                    button.innerText =
+                        oldText;
+
+                },
+                1500
+            );
+
+        }
+
+
+
+        /* ==========================================
+           COUNTER
+        =========================================== */
+
+        const counterData =
+            document.getElementById(
+                "counter-data"
+            );
+
+
+        let counterInterval = null;
+
+
+        let currentCount = 0;
+
+
+        let urlId = null;
+
+
+        if (counterData) {
+
+            urlId = parseInt(
+                counterData.dataset.urlId
+            );
+
+            currentCount = parseInt(
+                counterData.dataset.clickCount
+            ) || 0;
+
+        }
+
+
+        /* ==========================================
+           OPEN COUNTER
+        =========================================== */
+
+        function openCounterModal() {
+
+            const overlay =
+                document.getElementById(
+                    "counterOverlay"
+                );
+            if (!overlay) {
+                return;
+            }
+
+            overlay.classList.add("active");
+
+            /*
+             * Get the latest number immediately
+             */
+
+            updateClickCounter();
+
+
+            /*
+             * Start automatic updates
+             */
+
+            counterInterval =
+                setInterval(
+                    updateClickCounter,
+                    1000
+                );
+
+        }
+
+
+
+        /* ==========================================
+           CLOSE COUNTER
+        =========================================== */
+
+        function closeCounterModal() {
+
+            const overlay =
+                document.getElementById(
+                    "counterOverlay"
+                );
+
+
+            if (!overlay) {
+                return;
+            }
+
+
+            overlay.classList.remove("active");
+
+
+            /*
+             * Stop automatic updates
+             */
+
+            if (counterInterval) {
+
+                clearInterval(
+                    counterInterval
+                );
+
+                counterInterval = null;
+
+            }
+
+        }
+
+
+
+        /* ==========================================
+           GET CURRENT CLICKS
+        =========================================== */
+
+        async function updateClickCounter() {
+
+            if (!urlId) {
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/clicks/${urlId}`
+                    );
+
+
+                if (!response.ok) {
+                    return;
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                const newCount =
+                    data.click_count;
+
+
+                /*
+                 * Only animate if
+                 * the number changed
+                 */
+
+                if (
+                    newCount !==
+                    currentCount
+                ) {
+
+                    animateCounter(
+                        currentCount,
+                        newCount
+                    );
+
+
+                    currentCount =
+                        newCount;
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Counter error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+
+        /* ==========================================
+           COUNTER ANIMATION
+        =========================================== */
+
+        function animateCounter(
+            oldValue,
+            newValue
+        ) {
+
+            const element =
+                document.getElementById(
+                    "modal-click-count"
+                );
+
+            if (!element) {
+                return;
+            }
+
+
+            const duration = 600;
+
+
+            const startTime =
+                performance.now();
+
+
+            function animation(
+                currentTime
+            ) {
+
+                const elapsed =
+                    currentTime -
+                    startTime;
+
+
+                const progress =
+                    Math.min(
+                        elapsed / duration,
+                        1
+                    );
+
+
+                const easedProgress =
+                    1 - Math.pow(
+                        1 - progress,
+                        3
+                    );
+
+                const value =
+                    Math.round(
+                        oldValue +
+                        (newValue - oldValue) *
+                        easedProgress
+                    );
+
+
+                element.textContent =
+                    value;
+
+
+                if (progress < 1) {
+
+                    requestAnimationFrame(
+                        animation
+                    );
+
+                }
+
+            }
+
+
+            requestAnimationFrame(
+                animation
+            );
+
+        }
+
+
+
+        /* ==========================================
+           CLOSE MODALS WHEN CLICKING OUTSIDE
+        =========================================== */
+
+        window.addEventListener(
+            "click",
+            function(event) {
+
+
+                const authOverlay =
+                    document.getElementById(
+                        "authOverlay"
+                    );
+
+
+                const counterOverlay =
+                    document.getElementById(
+                        "counterOverlay"
+                    );
+
+
+                /*
+                 * Account modal
+                 */
+
+                if (authOverlay &&
+                    event.target ===
+                    authOverlay
+                ) {
+
+                    closeAuthModal();
+
+                }
+
+
+                /*
+                 * Counter modal
+                 */
+
+                if (counterOverlay &&
+                    event.target ===
+                    counterOverlay
+                ) {
+
+                    closeCounterModal();
+
+                }
+
+            }
+
+        );
+
+        /* ==========================================
+        ESCAPE KEY
+        ========================================== */
+
+        window.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (event.key === "Escape") {
+
+                    closeAuthModal();
+
+                    closeCounterModal();
+
+                }
+
+            }
+        );
+
+    </script>
+
+
 </body>
-<nav class="navbar">
-    <div class="logo">
-        <a href="/">URL<span>Shortener</span></a>
-    </div>
 
-    <ul class="nav-links">
-        <li><a href="/">Home</a></li>
-
-        <li>
-            <button class="account-btn" onclick="openAuthModal()">
-                Account
-            </button>
-        </li>
-    </ul>
-</nav>
-
-<div class="auth-overlay" id="authModal">
-
-    <div class="auth-box">
-
-        <button class="close-btn" onclick="closeAuthModal()">
-            &times;
-        </button>
-
-        <h2>Welcome 👋</h2>
-
-        <p class="auth-subtitle">
-            Access your URLShortener account
-        </p>
-
-        <a href="/login" class="auth-option">
-            <div class="auth-icon">🔐</div>
-
-            <div>
-                <h3>Login</h3>
-                <p>I already have an account</p>
-            </div>
-        </a>
-
-        <a href="/signin" class="auth-option">
-            <div class="auth-icon">✨</div>
-
-            <div>
-                <h3>Create Account</h3>
-                <p>I'm new to URLShortener</p>
-            </div>
-        </a>
-
-    </div>
-
-</div>
 </html>

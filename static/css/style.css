@@ -1093,3 +1093,509 @@ body {
     }
 
 }
+
+
+
+
+/* =========================================================
+   COUNTER CLICKS BUTTON
+========================================================= */
+
+.counter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 20px;
+
+    background: linear-gradient(
+        135deg,
+        #ff00cc,
+        #3333ff
+    );
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.counter-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 25px
+        rgba(255, 0, 204, 0.40);
+}
+
+
+.counter-btn:active {
+    transform: scale(0.96);
+}
+
+
+/* =========================================================
+   COUNTER OVERLAY
+========================================================= */
+
+.counter-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background:
+        rgba(8, 3, 30, 0.78);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    opacity: 0;
+    visibility: hidden;
+
+    pointer-events: none;
+
+    z-index: 9999;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+
+/* =========================================================
+   ACTIVE OVERLAY
+========================================================= */
+
+.counter-overlay.active {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   COUNTER BOX
+========================================================= */
+
+.counter-box {
+
+    position: relative;
+
+    width: 430px;
+
+    max-width: 100%;
+
+    padding: 40px;
+
+    box-sizing: border-box;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(54, 28, 91, 0.98),
+            rgba(25, 20, 70, 0.98)
+        );
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.18);
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 25px 70px
+        rgba(0, 0, 0, 0.55);
+
+    transform:
+        translateY(25px)
+        scale(0.94);
+
+    opacity: 0;
+
+    transition:
+        transform 0.35s cubic-bezier(
+            0.34,
+            1.56,
+            0.64,
+            1
+        ),
+        opacity 0.25s ease;
+}
+
+
+/* =========================================================
+   ACTIVE BOX
+========================================================= */
+
+.counter-overlay.active .counter-box {
+
+    transform:
+        translateY(0)
+        scale(1);
+
+    opacity: 1;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.counter-box .close-btn {
+
+    position: absolute;
+
+    top: 14px;
+    right: 18px;
+
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 30px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    opacity: 0.7;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.counter-box .close-btn:hover {
+
+    opacity: 1;
+
+    color: #ff4bb8;
+
+    transform: scale(1.15);
+}
+
+
+/* =========================================================
+   COUNTER ICON
+========================================================= */
+
+.counter-box .counter-icon {
+
+    width: 70px;
+    height: 70px;
+
+    margin:
+        0 auto 20px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff00cc,
+            #3333ff
+        );
+
+    font-size: 32px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(255, 0, 204, 0.30);
+
+    animation:
+        counterIconPulse 2s
+        ease-in-out infinite;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.counter-box h2 {
+
+    margin:
+        0 0 10px;
+
+    color: white;
+
+    font-size: 30px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   URL
+========================================================= */
+
+.counter-box .counter-url {
+
+    margin:
+        0 auto 25px;
+
+    max-width: 100%;
+
+    color: #d8cce8;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    word-break: break-all;
+}
+
+
+/* =========================================================
+   NUMBER CONTAINER
+========================================================= */
+
+.counter-number-container {
+
+    width: 210px;
+    height: 130px;
+
+    margin:
+        20px auto 10px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 22px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.15);
+
+    box-shadow:
+        inset 0 0 25px
+        rgba(255, 0, 204, 0.08);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   NUMBER
+========================================================= */
+
+#modal-click-count {
+
+    display: block;
+
+    font-size: 65px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    color: white;
+
+    text-shadow:
+        0 0 25px
+        rgba(255, 0, 204, 0.30);
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.counter-label {
+
+    margin:
+        12px 0;
+
+    color: #bdb2ce;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   LIVE COUNTER
+========================================================= */
+
+.counter-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 15px;
+
+    padding:
+        8px 16px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    color: #c9bfd5;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   GREEN DOT
+========================================================= */
+
+.status-dot {
+
+    width: 9px;
+    height: 9px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #00ff88;
+
+    box-shadow:
+        0 0 10px
+        rgba(0, 255, 136, 0.9);
+
+    animation:
+        counterPulse 1.5s
+        ease-in-out infinite;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes counterPulse {
+
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes counterIconPulse {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.04);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .counter-box {
+
+        width: 100%;
+
+        padding:
+            35px 20px;
+    }
+
+
+    .counter-box h2 {
+
+        font-size: 25px;
+    }
+
+
+    .counter-number-container {
+
+        width: 180px;
+        height: 115px;
+    }
+
+
+    #modal-click-count {
+
+        font-size: 55px;
+    }
+
+}
