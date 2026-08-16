@@ -265,6 +265,7 @@ def shorten_form(
     "index.html",
     {
         "short_url": short_url,
+        "original_url": new_url.original_url,
         "click_count": 0,
         "url_id": new_url.id
     }
@@ -577,3 +578,4 @@ def redirect_url(
             "countdown": AD_COUNTDOWN_SECONDS
         }
     )
+

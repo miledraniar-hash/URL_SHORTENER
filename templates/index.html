@@ -100,6 +100,44 @@
             </form>
 
 
+            <!-- ======================================
+                 PAST SEARCH HISTORY
+                 Auto-shown from localStorage - no
+                 login needed, purely client-side.
+                 Hidden by default via inline style,
+                 JS reveals it if there's data.
+            ======================================= -->
+
+            <div
+                class="history-section"
+                id="historySection"
+                style="display: none;"
+            >
+
+                <div class="history-header">
+
+                    <h3>
+                        Your recent links
+                    </h3>
+
+                    <button
+                        type="button"
+                        class="history-clear-btn"
+                        onclick="clearUrlHistory()"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+                <ul
+                    class="history-list"
+                    id="historyList"
+                ></ul>
+
+            </div>
+
+
 
             <!-- ======================================
                  RESULT + COUNTER (both need short_url)
@@ -123,6 +161,7 @@
                         href="{{ short_url }}"
                         target="_blank"
                         id="short-url-link"
+                        data-original-url="{{ original_url }}"
                     >
                         {{ short_url }}
                     </a>
@@ -468,6 +507,11 @@
                         {{ countdown }}
                     </span>
 
+                    <span class="ad-countdown-label">
+                        Redirecting in
+                        <span id="adSeconds">{{ countdown }}</span>s
+                    </span>
+
                 </div>
 
 
@@ -666,6 +710,247 @@
             );
 
         }
+
+
+
+        /* ==========================================
+           PAST SEARCH HISTORY (localStorage)
+        =========================================== */
+
+        const HISTORY_KEY =
+            "urlshortener_history";
+
+        const MAX_HISTORY_ITEMS = 10;
+
+
+        function loadUrlHistory() {
+
+            try {
+
+                const raw =
+                    localStorage.getItem(
+                        HISTORY_KEY
+                    );
+
+                return raw ?
+                    JSON.parse(raw) :
+                    [];
+
+            } catch (error) {
+
+                console.error(
+                    "History read error:",
+                    error
+                );
+
+                return [];
+
+            }
+
+        }
+
+
+        function saveUrlHistory(history) {
+
+            try {
+
+                localStorage.setItem(
+                    HISTORY_KEY,
+                    JSON.stringify(history)
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "History write error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        function addToUrlHistory(
+            shortUrl,
+            originalUrl
+        ) {
+
+            if (!shortUrl) {
+                return;
+            }
+
+            let history =
+                loadUrlHistory();
+
+            /*
+             * Remove any earlier entry for the
+             * same short URL, then put the fresh
+             * one at the front
+             */
+
+            history = history.filter(
+                function (item) {
+
+                    return item.short_url !==
+                        shortUrl;
+
+                }
+            );
+
+            history.unshift({
+                short_url: shortUrl,
+                original_url: originalUrl || "",
+                created_at: Date.now()
+            });
+
+            if (
+                history.length >
+                MAX_HISTORY_ITEMS
+            ) {
+
+                history =
+                    history.slice(
+                        0,
+                        MAX_HISTORY_ITEMS
+                    );
+
+            }
+
+            saveUrlHistory(history);
+
+        }
+
+
+        function renderUrlHistory() {
+
+            const section =
+                document.getElementById(
+                    "historySection"
+                );
+
+            const list =
+                document.getElementById(
+                    "historyList"
+                );
+
+            if (!section || !list) {
+                return;
+            }
+
+            const history =
+                loadUrlHistory();
+
+            if (history.length === 0) {
+
+                section.style.display =
+                    "none";
+
+                return;
+
+            }
+
+            section.style.display =
+                "block";
+
+            list.innerHTML = "";
+
+            history.forEach(function (item) {
+
+                const li =
+                    document.createElement(
+                        "li"
+                    );
+
+                li.className =
+                    "history-item";
+
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+                link.href =
+                    item.short_url;
+
+                link.target =
+                    "_blank";
+
+                link.textContent =
+                    item.short_url;
+
+                link.className =
+                    "history-short-link";
+
+
+                const original =
+                    document.createElement(
+                        "span"
+                    );
+
+                original.className =
+                    "history-original";
+
+                original.textContent =
+                    item.original_url;
+
+                original.title =
+                    item.original_url;
+
+
+                li.appendChild(link);
+                li.appendChild(original);
+
+                list.appendChild(li);
+
+            });
+
+        }
+
+
+        function clearUrlHistory() {
+
+            localStorage.removeItem(
+                HISTORY_KEY
+            );
+
+            renderUrlHistory();
+
+        }
+
+
+        /*
+         * If this page load just produced a new
+         * short URL, save it to history first
+         */
+
+        (function captureNewShortUrl() {
+
+            const shortLink =
+                document.getElementById(
+                    "short-url-link"
+                );
+
+            if (shortLink) {
+
+                addToUrlHistory(
+                    shortLink.href,
+                    shortLink.dataset
+                        .originalUrl
+                );
+
+            }
+
+        })();
+
+
+        /*
+         * Always render history on load, on
+         * every page (home, or after shortening)
+         */
+
+        renderUrlHistory();
 
 
 
