@@ -1,19 +1,22 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, Form
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import RedirectResponse, HTMLResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from database import engine, SessionLocal
 from models.url import URL, Base
+from models.user import User
 from services.url_service import generate_short_code
 from passlib.context import CryptContext
 from models.admin import Admin
 from starlette.middleware.sessions import SessionMiddleware
 from models.click import Click
 from datetime import datetime, timedelta, timezone
+from io import BytesIO
 
 import base64
 import validators
+import qrcode
 
 
 app = FastAPI()
@@ -220,6 +223,26 @@ def create_short_url(
 
 
 # ==========================================
+# CURRENT USER HELPER (public accounts,
+# separate from the Admin login)
+# ==========================================
+
+def get_current_user(
+    request: Request,
+    db: Session
+) -> User | None:
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return None
+
+    return db.query(User).filter(
+        User.id == user_id
+    ).first()
+
+
+# ==========================================
 # JSON API
 # ==========================================
 
@@ -260,16 +283,19 @@ def shorten_form(
         f"{new_url.short_code}"
     )
 
+    user = get_current_user(request, db)
+
     return templates.TemplateResponse(
-    request,
-    "index.html",
-    {
-        "short_url": short_url,
-        "original_url": new_url.original_url,
-        "click_count": 0,
-        "url_id": new_url.id
-    }
-)
+        request,
+        "index.html",
+        {
+            "short_url": short_url,
+            "original_url": new_url.original_url,
+            "click_count": 0,
+            "url_id": new_url.id,
+            "user": user
+        }
+    )
 
 
 # ==========================================
@@ -277,11 +303,19 @@ def shorten_form(
 # ==========================================
 
 @app.get("/", response_class=HTMLResponse)
-def home(request: Request):
+def home(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+
+    user = get_current_user(request, db)
 
     return templates.TemplateResponse(
         request,
-        "index.html"
+        "index.html",
+        {
+            "user": user
+        }
     )
 
 
@@ -304,41 +338,49 @@ def login(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    # Chercher l'admin dans PostgreSQL
+    # 1. Tentative de connexion admin
     admin = db.query(Admin).filter(
         Admin.email == email
     ).first()
 
-    # Admin inexistant
-    if not admin:
-        return templates.TemplateResponse(
-            request,
-            "login.html",
-            {
-                "error": "Email ou mot de passe incorrect."
-            }
-        )
-
-    # Vérifier le mot de passe avec bcrypt
-    if not pwd_context.verify(
+    if admin and pwd_context.verify(
         password,
         admin.password_hash
     ):
-        return templates.TemplateResponse(
-            request,
-            "login.html",
-            {
-                "error": "Email ou mot de passe incorrect."
-            }
+
+        request.session["admin_id"] = admin.id
+        request.session["admin_email"] = admin.email
+
+        return RedirectResponse(
+            url="/admin",
+            status_code=303
         )
 
-    # Connexion réussie
-    request.session["admin_id"] = admin.id
-    request.session["admin_email"] = admin.email
+    # 2. Tentative de connexion utilisateur public
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
 
-    return RedirectResponse(
-        url="/admin",
-        status_code=303
+    if user and pwd_context.verify(
+        password,
+        user.password_hash
+    ):
+
+        request.session["user_id"] = user.id
+        request.session["user_email"] = user.email
+
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
+
+    # 3. Aucune correspondance
+    return templates.TemplateResponse(
+        request,
+        "login.html",
+        {
+            "error": "Email ou mot de passe incorrect."
+        }
     )
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -391,16 +433,34 @@ def admin_page(
             "click_count": click_count
         })
 
+    # ==========================================
+    # STATS DASHBOARD NUMBERS
+    # ==========================================
+
+    total_urls = len(url_data)
+
+    total_clicks = db.query(Click).count()
+
+    monetized_clicks = db.query(Click).filter(
+        Click.is_monetized == True
+    ).count()
+
+    blocked_clicks = total_clicks - monetized_clicks
+
     return templates.TemplateResponse(
         request,
         "admin.html",
         {
             "admin": admin,
-            "urls": url_data
+            "urls": url_data,
+            "total_urls": total_urls,
+            "total_clicks": total_clicks,
+            "monetized_clicks": monetized_clicks,
+            "blocked_clicks": blocked_clicks
         }
     )
 # ==========================================
-# SIGN IN PAGE
+# SIGN IN PAGE (public account creation)
 # ==========================================
 
 @app.get("/signin", response_class=HTMLResponse)
@@ -410,6 +470,76 @@ def signin_page(request: Request):
         request,
         "signin.html"
     )
+
+@app.post("/signin", response_class=HTMLResponse)
+def signin(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...),
+    password_confirm: str = Form(...),
+    db: Session = Depends(get_db)
+):
+
+    # 1. Vérifier que les 2 mots de passe correspondent
+    if password != password_confirm:
+
+        return templates.TemplateResponse(
+            request,
+            "signin.html",
+            {
+                "error": "Les mots de passe ne correspondent pas."
+            }
+        )
+
+    # 2. Vérifier que l'email n'est pas déjà utilisé
+    existing_user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    if existing_user:
+
+        return templates.TemplateResponse(
+            request,
+            "signin.html",
+            {
+                "error": "Un compte existe déjà avec cet email."
+            }
+        )
+
+    # 3. Créer le compte
+    new_user = User(
+        email=email,
+        password_hash=pwd_context.hash(password)
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    # 4. Connecter automatiquement l'utilisateur
+    request.session["user_id"] = new_user.id
+    request.session["user_email"] = new_user.email
+
+    return RedirectResponse(
+        url="/",
+        status_code=303
+    )
+
+
+# ==========================================
+# LOGOUT (public account)
+# ==========================================
+
+@app.get("/logout")
+def logout(request: Request):
+
+    request.session.clear()
+
+    return RedirectResponse(
+        url="/",
+        status_code=303
+    )
+
 
 @app.get("/api/clicks/{url_id}")
 def get_click_count(
@@ -435,6 +565,58 @@ def get_click_count(
         "url_id": url_id,
         "click_count": click_count
     }
+
+
+# ==========================================
+# QR CODE (only for logged-in public users)
+# ==========================================
+
+@app.get("/qr/{url_id}")
+def get_qr_code(
+    url_id: int,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+
+    # 1. L'utilisateur doit avoir un compte
+    user = get_current_user(request, db)
+
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Connexion requise pour générer un QR Code"
+        )
+
+    # 2. Récupérer l'URL
+    url = db.query(URL).filter(
+        URL.id == url_id
+    ).first()
+
+    if not url:
+        raise HTTPException(
+            status_code=404,
+            detail="URL not found"
+        )
+
+    short_url = (
+        f"{request.base_url}"
+        f"{url.short_code}"
+    )
+
+    # 3. Générer le QR code en PNG en mémoire
+    qr_img = qrcode.make(short_url)
+
+    buffer = BytesIO()
+
+    qr_img.save(buffer, format="PNG")
+
+    buffer.seek(0)
+
+    return StreamingResponse(
+        buffer,
+        media_type="image/png"
+    )
+
 
 @app.get(
     "/counter/{url_id}",
@@ -482,6 +664,10 @@ def admin_counter_page(
 ):
 
     # Vérifier si l'admin est connecté
+    # (avant, cette route était accessible à
+    # n'importe qui connaissant un url_id -
+    # corrigé ici pour exiger une session admin)
+
     admin_id = request.session.get("admin_id")
 
     if not admin_id:
@@ -490,6 +676,17 @@ def admin_counter_page(
             status_code=303
         )
 
+    admin = db.query(Admin).filter(
+        Admin.id == admin_id
+    ).first()
+
+    if not admin:
+        request.session.clear()
+
+        return RedirectResponse(
+            url="/login",
+            status_code=303
+        )
 
     # Chercher l'URL
     url = db.query(URL).filter(
@@ -521,6 +718,12 @@ def admin_counter_page(
 # ==========================================
 # REDIRECT SHORT URL (via ad interstitial)
 # ==========================================
+#
+# NOTE: this catch-all route must stay LAST
+# among GET routes with a single path segment
+# (like /qr/{url_id}, /login, /signin...),
+# otherwise it would swallow them. FastAPI
+# matches routes in declaration order.
 
 @app.get("/{short_code}", response_class=HTMLResponse)
 def redirect_url(
@@ -578,4 +781,3 @@ def redirect_url(
             "countdown": AD_COUNTDOWN_SECONDS
         }
     )
-

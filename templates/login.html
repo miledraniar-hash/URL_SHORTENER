@@ -50,6 +50,12 @@
                 Login to your URLShortener account
             </p>
 
+            {% if error %}
+            <p class="form-error">
+                {{ error }}
+            </p>
+            {% endif %}
+
 
             <form action="/login" method="POST">
 

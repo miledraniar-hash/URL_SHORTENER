@@ -47,6 +47,26 @@
                 </a>
             </li>
 
+            {% if user %}
+
+            <li>
+                <span class="user-email">
+                    👤 {{ user.email }}
+                </span>
+            </li>
+
+            <li>
+                <a
+                    href="/logout"
+                    class="account-btn"
+                    onclick="return confirmLogout()"
+                >
+                    Déconnexion
+                </a>
+            </li>
+
+            {% else %}
+
             <li>
 
                 <button
@@ -57,6 +77,8 @@
                 </button>
 
             </li>
+
+            {% endif %}
 
         </ul>
 
@@ -187,6 +209,31 @@
                     >
                         📊 Counter Clicks
                     </button>
+
+
+                    <!-- QR CODE (locked unless logged in) -->
+
+                    {% if user %}
+
+                    <button
+                        type="button"
+                        class="counter-btn qr-btn"
+                        onclick="openQrModal()"
+                    >
+                        🔳 QR Code
+                    </button>
+
+                    {% else %}
+
+                    <a
+                        href="/signin"
+                        class="counter-btn qr-btn qr-locked"
+                        title="Créez un compte pour débloquer le QR Code"
+                    >
+                        🔒 QR Code
+                    </a>
+
+                    {% endif %}
 
                 </div>
 
@@ -384,6 +431,72 @@
                 </div>
 
             </div>
+
+
+            <!-- ======================================
+                QR CODE MODAL (only rendered when the
+                visitor has a public account)
+            ======================================= -->
+
+            {% if user %}
+
+            <div
+                class="counter-overlay"
+                id="qrOverlay"
+            >
+
+                <div class="counter-box">
+
+                    <!-- CLOSE -->
+                    <button
+                        type="button"
+                        class="close-btn"
+                        onclick="closeQrModal()"
+                    >
+                        &times;
+                    </button>
+
+
+                    <!-- ICON -->
+                    <div class="counter-icon">
+                        🔳
+                    </div>
+
+
+                    <!-- TITLE -->
+                    <h2>
+                        Votre QR Code
+                    </h2>
+
+
+                    <!-- URL -->
+                    <p class="counter-url">
+                        {{ short_url }}
+                    </p>
+
+
+                    <!-- QR IMAGE -->
+                    <img
+                        src="/qr/{{ url_id }}"
+                        alt="QR Code"
+                        class="qr-image"
+                    >
+
+
+                    <!-- DOWNLOAD -->
+                    <a
+                        href="/qr/{{ url_id }}"
+                        download="qrcode.png"
+                        class="login-btn qr-download-btn"
+                    >
+                        Télécharger
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endif %}
 
             {% endif %}
 
@@ -636,6 +749,20 @@
 
 
         /* ==========================================
+           CONFIRM LOGOUT
+        =========================================== */
+
+        function confirmLogout() {
+
+            return confirm(
+                "Êtes-vous sûr de vouloir vous déconnecter ?"
+            );
+
+        }
+
+
+
+        /* ==========================================
            ACCOUNT MODAL
         =========================================== */
 
@@ -668,7 +795,7 @@
            COPY SHORT URL
         =========================================== */
 
-        function copyShortUrl() {
+        async function copyShortUrl() {
 
             const link =
                 document.getElementById(
@@ -678,9 +805,79 @@
                 return;
             }
 
-            navigator.clipboard.writeText(
-                link.href
-            );
+            const url = link.href;
+
+            /*
+             * Copy both a rich HTML link and a
+             * plain-text fallback. Apps that
+             * support pasting rich content (Gmail,
+             * Docs, Notion, Slack desktop...) will
+             * paste an actual clickable link
+             * instead of raw text. Apps that only
+             * accept plain text fall back to the
+             * URL string, same as before.
+             */
+
+            try {
+
+                if (
+                    navigator.clipboard &&
+                    window.ClipboardItem
+                ) {
+
+                    const htmlBlob = new Blob(
+                        [
+                            `<a href="${url}">${url}</a>`
+                        ],
+                        { type: "text/html" }
+                    );
+
+                    const textBlob = new Blob(
+                        [url],
+                        { type: "text/plain" }
+                    );
+
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            "text/html": htmlBlob,
+                            "text/plain": textBlob
+                        })
+                    ]);
+
+                } else {
+
+                    await navigator.clipboard.writeText(
+                        url
+                    );
+
+                }
+
+            } catch (error) {
+
+                /*
+                 * Some browsers restrict the rich
+                 * ClipboardItem API - fall back to
+                 * plain text so Copy still works.
+                 */
+
+                try {
+
+                    await navigator.clipboard.writeText(
+                        url
+                    );
+
+                } catch (fallbackError) {
+
+                    console.error(
+                        "Copy error:",
+                        fallbackError
+                    );
+
+                    return;
+
+                }
+
+            }
 
 
             const button =
@@ -1062,6 +1259,43 @@
 
 
         /* ==========================================
+           OPEN / CLOSE QR CODE MODAL
+        =========================================== */
+
+        function openQrModal() {
+
+            const overlay =
+                document.getElementById(
+                    "qrOverlay"
+                );
+
+            if (!overlay) {
+                return;
+            }
+
+            overlay.classList.add("active");
+
+        }
+
+
+        function closeQrModal() {
+
+            const overlay =
+                document.getElementById(
+                    "qrOverlay"
+                );
+
+            if (!overlay) {
+                return;
+            }
+
+            overlay.classList.remove("active");
+
+        }
+
+
+
+        /* ==========================================
            GET CURRENT CLICKS
         =========================================== */
 
@@ -1354,6 +1588,12 @@
                     );
 
 
+                const qrOverlay =
+                    document.getElementById(
+                        "qrOverlay"
+                    );
+
+
                 /*
                  * Account modal
                  */
@@ -1381,6 +1621,20 @@
 
                 }
 
+
+                /*
+                 * QR modal
+                 */
+
+                if (qrOverlay &&
+                    event.target ===
+                    qrOverlay
+                ) {
+
+                    closeQrModal();
+
+                }
+
             }
 
         );
@@ -1398,6 +1652,8 @@
                     closeAuthModal();
 
                     closeCounterModal();
+
+                    closeQrModal();
 
                 }
 

@@ -1,92 +1,249 @@
 <!DOCTYPE html>
-<html lang="fr">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Admin Dashboard</title>
+    <title>Admin - URLShortener</title>
 
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
-<body>
+<body class="login-page">
 
-    <div class="admin-container">
+    <!-- NAVBAR -->
+    <nav class="navbar">
 
-        <h1>Bienvenue Admin 👋</h1>
+        <div class="logo">
+            <a href="/">
+                URL<span>Shortener</span>
+            </a>
+        </div>
 
-        <p>
-            Connecté avec :
-            <strong>{{ admin.email }}</strong>
-        </p>
+        <ul class="nav-links">
 
-        <hr>
+            <li>
+                <span class="user-email">
+                    🛡️ {{ admin.email }}
+                </span>
+            </li>
 
-        <h2>Dashboard</h2>
-
-        <p>
-            Ici nous allons ajouter les statistiques,
-            l'historique des URLs, les clics, etc.
-        </p>
-
-    </div>
-    <table class="urls-table">
-
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Original URL</th>
-            <th>Short URL</th>
-            <th>Clicks</th>
-            <th>Created</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        {% for url in urls %}
-
-        <tr>
-
-            <td>
-                {{ url.id }}
-            </td>
-
-            <td>
-                {{ url.original_url }}
-            </td>
-
-            <td>
+            <li>
                 <a
-                    href="/{{ url.short_code }}"
-                    target="_blank"
+                    href="/logout"
+                    class="account-btn"
+                    onclick="return confirmLogout()"
                 >
-                    /{{ url.short_code }}
+                    Déconnexion
                 </a>
-            </td>
+            </li>
 
-            <td>
-                <a
-                    href="/admin/counter/{{ url.id }}"
-                    class="counter-btn"
+        </ul>
+
+    </nav>
+
+
+    <!-- ADMIN MAIN -->
+    <main class="admin-container">
+
+        <div class="admin-header">
+
+            <h1>Admin Panel</h1>
+
+            <p class="admin-subtitle">
+                Vue d'ensemble et historique de tous les liens
+            </p>
+
+            <!-- TABS -->
+            <div class="admin-tabs">
+
+                <button
+                    type="button"
+                    class="admin-tab active"
+                    id="tab-dashboard"
+                    onclick="switchAdminTab('dashboard')"
                 >
-                    📊 Counter Clicks
-                </a>
-            </td>
+                    📊 Dashboard
+                </button>
 
-            <td>
-                {{ url.created_at }}
-            </td>
+                <button
+                    type="button"
+                    class="admin-tab"
+                    id="tab-historique"
+                    onclick="switchAdminTab('historique')"
+                >
+                    🕒 Historique
+                </button>
 
-        </tr>
+            </div>
 
-        {% endfor %}
+        </div>
 
-    </tbody>
 
-</table>
+        <!-- ======================================
+             DASHBOARD VIEW
+        ======================================= -->
+
+        <section class="admin-view active" id="view-dashboard">
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">🔗</div>
+                    <div class="stat-value">{{ total_urls }}</div>
+                    <div class="stat-label">Liens créés</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">👆</div>
+                    <div class="stat-value">{{ total_clicks }}</div>
+                    <div class="stat-label">Clics totaux</div>
+                </div>
+
+                <div class="stat-card stat-good">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value">{{ monetized_clicks }}</div>
+                    <div class="stat-label">Clics monétisés</div>
+                </div>
+
+                <div class="stat-card stat-warn">
+                    <div class="stat-icon">🚫</div>
+                    <div class="stat-value">{{ blocked_clicks }}</div>
+                    <div class="stat-label">Clics bloqués (anti-fraude)</div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             HISTORIQUE VIEW (all links table)
+        ======================================= -->
+
+        <section class="admin-view" id="view-historique">
+
+            <div class="admin-table-wrapper">
+
+                <table class="admin-table">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Lien court</th>
+                            <th>URL d'origine</th>
+                            <th>Créé le</th>
+                            <th>Clics</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for url in urls %}
+
+                        <tr>
+                            <td>{{ url.id }}</td>
+
+                            <td>
+                                <a
+                                    href="/{{ url.short_code }}"
+                                    target="_blank"
+                                    class="admin-link"
+                                >
+                                    /{{ url.short_code }}
+                                </a>
+                            </td>
+
+                            <td class="admin-original-url" title="{{ url.original_url }}">
+                                {{ url.original_url }}
+                            </td>
+
+                            <td>{{ url.created_at }}</td>
+
+                            <td>
+                                <span class="click-badge">
+                                    {{ url.click_count }}
+                                </span>
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                        {% if not urls %}
+
+                        <tr>
+                            <td colspan="5" class="admin-empty">
+                                Aucun lien pour le moment.
+                            </td>
+                        </tr>
+
+                        {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        /* ==========================================
+           CONFIRM LOGOUT
+        =========================================== */
+
+        function confirmLogout() {
+
+            return confirm(
+                "Êtes-vous sûr de vouloir vous déconnecter ?"
+            );
+
+        }
+
+
+        /* ==========================================
+           TABS
+        =========================================== */
+
+        function switchAdminTab(tab) {
+
+            const dashboardView =
+                document.getElementById("view-dashboard");
+
+            const historiqueView =
+                document.getElementById("view-historique");
+
+            const dashboardTab =
+                document.getElementById("tab-dashboard");
+
+            const historiqueTab =
+                document.getElementById("tab-historique");
+
+            if (tab === "dashboard") {
+
+                dashboardView.classList.add("active");
+                historiqueView.classList.remove("active");
+
+                dashboardTab.classList.add("active");
+                historiqueTab.classList.remove("active");
+
+            } else {
+
+                historiqueView.classList.add("active");
+                dashboardView.classList.remove("active");
+
+                historiqueTab.classList.add("active");
+                dashboardTab.classList.remove("active");
+
+            }
+
+        }
+
+    </script>
 
 </body>
-
 </html>

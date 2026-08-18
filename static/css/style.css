@@ -116,6 +116,16 @@ body {
 
 
 /* ==============================
+   LOGGED-IN USER EMAIL (navbar)
+============================== */
+
+.user-email {
+    color: #d8cce8;
+    font-size: 14px;
+}
+
+
+/* ==============================
    AUTH MODAL
 ============================== */
 
@@ -950,6 +960,97 @@ body {
     text-decoration: underline;
 
 }
+
+
+/* ==============================
+   FORM ERROR MESSAGE
+============================== */
+
+.form-error {
+
+    background: rgba(255, 0, 80, 0.12);
+
+    border: 1px solid rgba(255, 0, 80, 0.3);
+
+    color: #ff9fb8;
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+
+    margin-bottom: 18px;
+
+    text-align: center;
+
+}
+
+
+/* ==============================
+   OAUTH PLACEHOLDERS
+   (Google / Apple - disabled until
+   real OAuth credentials are wired up)
+============================== */
+
+.oauth-divider {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 22px 0;
+
+    color: #817c94;
+
+    font-size: 13px;
+
+}
+
+.oauth-divider::before,
+.oauth-divider::after {
+
+    content: "";
+
+    flex: 1;
+
+    height: 1px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+}
+
+.oauth-btn {
+
+    width: 100%;
+
+    padding: 12px;
+
+    margin-bottom: 10px;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    background: rgba(255, 255, 255, 0.05);
+
+    color: #817c94;
+
+    font-size: 14px;
+
+    cursor: not-allowed;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+}
+
 /* ==========================================
    SHORT URL
 ========================================== */
@@ -960,6 +1061,7 @@ body {
     justify-content: center;
     gap: 10px;
     margin-top: 10px;
+    flex-wrap: wrap;
 }
 
 .short-url-row a {
@@ -1098,7 +1200,7 @@ body {
 
 
 /* =========================================================
-   COUNTER CLICKS BUTTON
+   COUNTER CLICKS BUTTON (also used for QR Code button)
 ========================================================= */
 
 .counter-btn {
@@ -1124,6 +1226,8 @@ body {
 
     cursor: pointer;
 
+    text-decoration: none;
+
     transition:
         transform 0.25s ease,
         box-shadow 0.25s ease;
@@ -1145,7 +1249,32 @@ body {
 
 
 /* =========================================================
-   COUNTER OVERLAY
+   QR CODE BUTTON - LOCKED STATE
+========================================================= */
+
+.qr-locked {
+
+    background: linear-gradient(
+        135deg,
+        #5a5a66,
+        #3a3a44
+    );
+
+    opacity: 0.9;
+
+}
+
+.qr-locked:hover {
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.35);
+
+}
+
+
+/* =========================================================
+   COUNTER OVERLAY (also reused for the QR modal)
 ========================================================= */
 
 .counter-overlay {
@@ -1566,6 +1695,38 @@ body {
 
 
 /* =========================================================
+   QR CODE IMAGE + DOWNLOAD BUTTON (inside modal)
+========================================================= */
+
+.qr-image {
+
+    width: 200px;
+    height: 200px;
+
+    margin: 15px auto 20px;
+
+    padding: 10px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    display: block;
+
+}
+
+.qr-download-btn {
+
+    margin-top: 5px;
+
+    text-decoration: none;
+
+    display: inline-block;
+
+}
+
+
+/* =========================================================
    MOBILE
 ========================================================= */
 
@@ -1847,3 +2008,463 @@ body {
 
 }
 
+
+/* ==============================
+   ADMIN PANEL
+============================== */
+
+.admin-container {
+
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding: 110px 30px 60px;
+
+    box-sizing: border-box;
+
+}
+
+
+.admin-header {
+
+    text-align: center;
+
+    margin-bottom: 35px;
+
+}
+
+
+.admin-header h1 {
+
+    font-size: 40px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.admin-subtitle {
+
+    color: #aaa5bd;
+
+    font-size: 15px;
+
+    margin-bottom: 25px;
+
+}
+
+
+/* ==============================
+   TABS
+============================== */
+
+.admin-tabs {
+
+    display: inline-flex;
+
+    gap: 8px;
+
+    padding: 6px;
+
+    border-radius: 30px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+}
+
+
+.admin-tab {
+
+    border: none;
+
+    cursor: pointer;
+
+    padding: 10px 24px;
+
+    border-radius: 25px;
+
+    background: transparent;
+
+    color: #d8cce8;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: 0.3s ease;
+
+}
+
+
+.admin-tab.active {
+
+    background: linear-gradient(135deg, #ff00cc, #3333ff);
+
+    color: white;
+
+    box-shadow: 0 5px 20px rgba(255, 0, 204, 0.35);
+
+}
+
+
+/* ==============================
+   VIEWS (dashboard / historique)
+============================== */
+
+.admin-view {
+
+    display: none;
+
+    animation: fadeIn 0.4s ease;
+
+}
+
+
+.admin-view.active {
+
+    display: block;
+
+}
+
+
+/* ==============================
+   STATS GRID
+============================== */
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 20px;
+
+}
+
+
+.stat-card {
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    backdrop-filter: blur(15px);
+
+}
+
+
+.stat-icon {
+
+    font-size: 28px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.stat-value {
+
+    font-size: 36px;
+
+    font-weight: 800;
+
+    margin-bottom: 6px;
+
+}
+
+
+.stat-label {
+
+    font-size: 13px;
+
+    color: #bdb2ce;
+
+}
+
+
+.stat-good .stat-value {
+    color: #00ff88;
+}
+
+
+.stat-warn .stat-value {
+    color: #ff6b8a;
+}
+
+
+/* ==============================
+   ADMIN TABLE
+============================== */
+
+.admin-table-wrapper {
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+}
+
+
+.admin-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+
+.admin-table th {
+
+    text-align: left;
+
+    padding: 16px 18px;
+
+    font-size: 13px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+
+    color: #c5b9ff;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+
+.admin-table td {
+
+    padding: 14px 18px;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    vertical-align: middle;
+
+}
+
+
+.admin-link {
+
+    color: #ff9fc5;
+
+    text-decoration: none;
+
+}
+
+
+.admin-link:hover {
+
+    text-decoration: underline;
+
+}
+
+
+.admin-original-url {
+
+    max-width: 260px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #d8cce8;
+
+}
+
+
+.click-badge {
+
+    display: inline-block;
+
+    padding: 4px 12px;
+
+    border-radius: 15px;
+
+    background: rgba(255, 0, 204, 0.15);
+
+    font-weight: 700;
+
+    font-size: 13px;
+
+}
+
+
+.admin-action-btn {
+
+    padding: 7px 12px;
+
+    font-size: 13px;
+
+}
+
+
+.admin-empty {
+
+    text-align: center;
+
+    padding: 40px;
+
+    color: #817c94;
+
+}
+
+
+/* ==============================
+   MOBILE
+============================== */
+
+@media (max-width: 800px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-table th:nth-child(3),
+    .admin-table td:nth-child(3) {
+        display: none;
+    }
+
+}
+
+/* ==============================
+   HISTORY SECTION
+============================== */
+
+.history-section {
+    width: 100%;
+    max-width: 700px;
+
+    margin: 30px auto 0;
+
+    padding: 22px 25px;
+
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    backdrop-filter: blur(10px);
+}
+
+.history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 15px;
+}
+
+.history-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.history-clear-btn {
+    padding: 6px 16px;
+
+    border: none;
+    border-radius: 15px;
+
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+
+    font-size: 13px;
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+.history-clear-btn:hover {
+    background: #ff4d94;
+}
+
+.history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    flex-wrap: wrap;
+}
+
+.history-short-link {
+    color: #ff9fc5;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.history-short-link:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.history-original {
+    color: #aaa5bd;
+    font-size: 13px;
+
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .history-original {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+}
