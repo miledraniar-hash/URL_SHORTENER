@@ -784,17 +784,24 @@ def redirect_url(
         ip_address
     )
 
-    # 4. Create a new click (this visit passes through the ad)
-    click = Click(
-        url_id=url.id,
-        ip_address=ip_address,
-        user_agent=user_agent,
-        is_monetized=not duplicate
-    )
 
-    # 5. Save the click in PostgreSQL
-    db.add(click)
-    db.commit()
+    # 4. Create a new click (this visit passes through the ad)
+    try:
+
+        click = Click(
+            url_id=url.id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            is_monetized=not duplicate
+        )
+
+        # 5. Save the click in PostgreSQL
+        db.add(click)
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        print(f"Erreur lors de l'enregistrement du clic : {e}")
 
     # 6. Show the ad interstitial on top of index.html.
     #    Destination is obfuscated - it's decoded and
