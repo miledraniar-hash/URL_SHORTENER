@@ -88,28 +88,75 @@
 
             <div class="stats-grid">
 
+                <!-- TOTAL URLS -->
                 <div class="stat-card">
                     <div class="stat-icon">🔗</div>
-                    <div class="stat-value">{{ total_urls }}</div>
-                    <div class="stat-label">Liens créés</div>
+
+                    <div class="stat-value">
+                        {{ total_urls }}
+                    </div>
+
+                    <div class="stat-label">
+                        Liens créés
+                    </div>
                 </div>
 
+
+                <!-- TOTAL CLICKS -->
                 <div class="stat-card">
                     <div class="stat-icon">👆</div>
-                    <div class="stat-value">{{ total_clicks }}</div>
-                    <div class="stat-label">Clics totaux</div>
+
+                    <div class="stat-value">
+                        {{ total_clicks }}
+                    </div>
+
+                    <div class="stat-label">
+                        Clics totaux
+                    </div>
                 </div>
 
+
+                <!-- MONETIZED CLICKS -->
                 <div class="stat-card stat-good">
                     <div class="stat-icon">💰</div>
-                    <div class="stat-value">{{ monetized_clicks }}</div>
-                    <div class="stat-label">Clics monétisés</div>
+
+                    <div class="stat-value">
+                        {{ monetized_clicks }}
+                    </div>
+
+                    <div class="stat-label">
+                        Clics monétisés
+                    </div>
                 </div>
 
+
+                <!-- BLOCKED CLICKS -->
                 <div class="stat-card stat-warn">
                     <div class="stat-icon">🚫</div>
-                    <div class="stat-value">{{ blocked_clicks }}</div>
-                    <div class="stat-label">Clics bloqués (anti-fraude)</div>
+
+                    <div class="stat-value">
+                        {{ blocked_clicks }}
+                    </div>
+
+                    <div class="stat-label">
+                        Clics bloqués (anti-fraude)
+                    </div>
+                </div>
+
+
+                <!-- CONVERSION RATE -->
+                <div class="stat-card stat-conversion">
+
+                    <div class="stat-icon">📈</div>
+
+                    <div class="stat-value">
+                        {{ conversion_rate }}%
+                    </div>
+
+                    <div class="stat-label">
+                        Taux de conversion
+                    </div>
+
                 </div>
 
             </div>

@@ -13,6 +13,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from models.click import Click
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
+from dotenv import load_dotenv
 
 import base64
 import os
@@ -20,12 +21,25 @@ import validators
 import qrcode
 
 
+
+
+load_dotenv()
+
 app = FastAPI()
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY is not configured in .env"
+    )
 app.add_middleware(
     SessionMiddleware,
-    secret_key="change-this-secret-key"
+    secret_key=SECRET_KEY
 )
+
+
 
 # ==========================================
 # PASSWORD HASHING
@@ -94,7 +108,6 @@ def get_db():
 
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL")
 
-
 def build_short_url(
     request: Request,
     short_code: str
@@ -133,6 +146,7 @@ def get_client_ip(request: Request) -> str | None:
 
     forwarded_for = request.headers.get(
         "x-forwarded-for"
+
     )
 
     if forwarded_for:
@@ -475,6 +489,26 @@ def admin_page(
 
     blocked_clicks = total_clicks - monetized_clicks
 
+
+    # ==========================================
+    # CONVERSION RATE
+    # ==========================================
+
+    if total_clicks > 0:
+
+        conversion_rate = (
+            monetized_clicks / total_clicks
+        ) * 100
+
+    else:
+
+        conversion_rate = 0.0
+
+    conversion_rate = round(
+        conversion_rate,
+        2
+    )
+
     return templates.TemplateResponse(
         request,
         "admin.html",
@@ -484,7 +518,8 @@ def admin_page(
             "total_urls": total_urls,
             "total_clicks": total_clicks,
             "monetized_clicks": monetized_clicks,
-            "blocked_clicks": blocked_clicks
+            "blocked_clicks": blocked_clicks,
+            "conversion_rate": conversion_rate
         }
     )
 # ==========================================
@@ -594,6 +629,54 @@ def get_click_count(
         "click_count": click_count
     }
 
+# ==========================================
+# STATISTICS FOR A SHORT URL
+# ==========================================
+
+@app.get("/api/stats/{short_code}")
+def get_url_stats(
+    short_code: str,
+    db: Session = Depends(get_db)
+):
+    # 1. Find the URL
+    url = db.query(URL).filter(
+        URL.short_code == short_code
+    ).first()
+
+    if not url:
+        raise HTTPException(
+            status_code=404,
+            detail="URL not found"
+        )
+
+    # 2. Total clicks
+    total_clicks = db.query(Click).filter(
+        Click.url_id == url.id
+    ).count()
+
+    # 3. Monetized clicks
+    monetized_clicks = db.query(Click).filter(
+        Click.url_id == url.id,
+        Click.is_monetized == True
+    ).count()
+
+    # 4. Conversion rate
+    if total_clicks > 0:
+        conversion_rate = (
+            monetized_clicks / total_clicks
+        ) * 100
+    else:
+        conversion_rate = 0.0
+
+    return {
+        "short_code": url.short_code,
+        "total_clicks": total_clicks,
+        "monetized_clicks": monetized_clicks,
+        "conversion_rate": round(
+            conversion_rate,
+            2
+        )
+    }
 
 # ==========================================
 # QR CODE (only for logged-in public users)
