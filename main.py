@@ -166,13 +166,16 @@ def is_duplicate_click(
 
 def obfuscate_url(url: str) -> str:
 
-    reversed_url = url[::-1]
+    # Reverse the UTF-8 BYTES, not the characters.
+    # The browser undoes the operation at byte level
+    # too, so multi-byte characters (accents, IDN,
+    # emoji) survive the round trip intact.
 
-    encoded_bytes = base64.b64encode(
-        reversed_url.encode("utf-8")
-    )
+    reversed_bytes = url.encode("utf-8")[::-1]
 
-    return encoded_bytes.decode("utf-8")
+    return base64.b64encode(
+        reversed_bytes
+    ).decode("ascii")
 
 
 # ==========================================

@@ -1464,13 +1464,26 @@
 
             function deobfuscateUrl(encoded) {
 
-                const decoded =
-                    atob(encoded);
+                /*
+                 * atob() yields one character per
+                 * byte. Rebuild the real byte array,
+                 * reverse it, then decode it as UTF-8
+                 * so accents, IDN and emoji survive.
+                 */
 
-                return decoded
-                    .split("")
-                    .reverse()
-                    .join("");
+                const binary = atob(encoded);
+
+                const bytes = Uint8Array.from(
+                    binary,
+                    function (ch) {
+                        return ch.charCodeAt(0);
+                    }
+                );
+
+                bytes.reverse();
+
+                return new TextDecoder("utf-8")
+                    .decode(bytes);
 
             }
 
