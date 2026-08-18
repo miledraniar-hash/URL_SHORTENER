@@ -13,6 +13,37 @@
 
     <title>URL Shortener</title>
 
+    <!-- ==============================
+         SOCIAL PREVIEW (Open Graph)
+
+         Turns a shared link into a card
+         with a title instead of a bare
+         blue string. Deliberately generic:
+         showing the destination here would
+         let people skip the countdown by
+         just reading the preview.
+    =============================== -->
+
+    <meta property="og:type" content="website">
+
+    <meta property="og:site_name" content="URL Shortener">
+
+    <meta
+        property="og:title"
+        content="Votre lien est prêt"
+    >
+
+    <meta
+        property="og:description"
+        content="Cliquez pour accéder au contenu partagé."
+    >
+
+    {% if page_url %}
+    <meta property="og:url" content="{{ page_url }}">
+    {% endif %}
+
+    <meta name="twitter:card" content="summary">
+
     <link
         rel="stylesheet"
         href="/static/css/style.css"

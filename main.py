@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 from io import BytesIO
 
 import base64
+import os
 import validators
 import qrcode
 
@@ -80,6 +81,30 @@ def get_db():
 # AD INTERSTITIAL SETTINGS
 # ==========================================
 
+# ==========================================
+# PUBLIC BASE URL
+# ==========================================
+
+# Public address the short links are built on.
+# request.base_url only echoes the host the
+# browser used, which gives http://127.0.0.1:8000
+# in local dev - a link nobody else can open.
+# Set PUBLIC_BASE_URL in the environment once
+# deployed, e.g. https://sho.rt
+
+PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL")
+
+
+def build_short_url(
+    request: Request,
+    short_code: str
+) -> str:
+
+    base = PUBLIC_BASE_URL or str(request.base_url)
+
+    return f"{base.rstrip('/')}/{short_code}"
+
+
 AD_COUNTDOWN_SECONDS = 5
 
 
@@ -135,7 +160,7 @@ def is_duplicate_click(
     # to monetize (see redirect_url below).
 
     if not ip_address:
-        return False
+        return True
 
     window_start = (
         datetime.now(timezone.utc)
@@ -281,9 +306,9 @@ def shorten_form(
         db
     )
 
-    short_url = (
-        f"{request.base_url}"
-        f"{new_url.short_code}"
+    short_url = build_short_url(
+        request,
+        new_url.short_code
     )
 
     user = get_current_user(request, db)
@@ -601,9 +626,9 @@ def get_qr_code(
             detail="URL not found"
         )
 
-    short_url = (
-        f"{request.base_url}"
-        f"{url.short_code}"
+    short_url = build_short_url(
+        request,
+        url.short_code
     )
 
     # 3. Générer le QR code en PNG en mémoire
@@ -781,6 +806,7 @@ def redirect_url(
         {
             "show_ad": True,
             "destination_encoded": obfuscate_url(url.original_url),
-            "countdown": AD_COUNTDOWN_SECONDS
+            "countdown": AD_COUNTDOWN_SECONDS,
+            "page_url": build_short_url(request, short_code)
         }
     )
